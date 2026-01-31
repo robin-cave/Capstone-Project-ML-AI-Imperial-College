@@ -238,3 +238,12 @@ logs/
 wandb/
 mlruns/
 .mlflow/
+
+#Notes  
+Notes/  
+
+#IMP sample code from modules
+IMP_sample_code/
+
+
+
