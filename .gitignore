@@ -240,10 +240,11 @@ mlruns/
 .mlflow/
 
 #Notes  
-Notes/  
+notes/  
 
 #IMP sample code from modules
 IMP_sample_code/
 
+Week*/
 
 
