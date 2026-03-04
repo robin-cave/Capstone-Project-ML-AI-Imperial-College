@@ -1,0 +1,62 @@
+# Bayesian optimization capstone — reusable modules
+from .data import (
+    FunctionData,
+    DATA_DIR,
+    RESULTS_BASE,
+    load_results,
+    load_latest_results,
+    load_all_weeks,
+    initialize_from_history,
+    initialize_all_weeks,
+    update_all_functions_with_results,
+    update_function_with_result,
+)
+from .surrogates import SurrogateModel, GPSurrogate, SVMSurrogate, MLPSurrogate, gp_mean_gradient
+from .acquisition import (
+    AcquisitionFunction,
+    optimize_acquisition,
+    optimize_acquisition_enhanced,
+    optimize_acquisition_with_regional_focus,
+    add_boundary_samples_2d,
+)
+from .utils import (
+    format_for_portal,
+    PredictionTracker,
+    visualize_2d_surface,
+    analyze_function,
+    analyze_weekly_performance,
+    recommend_strategies,
+    plot_progress,
+    display_competition_summary,
+)
+
+__all__ = [
+    "FunctionData",
+    "DATA_DIR",
+    "RESULTS_BASE",
+    "load_results",
+    "load_latest_results",
+    "load_all_weeks",
+    "initialize_from_history",
+    "initialize_all_weeks",
+    "update_all_functions_with_results",
+    "update_function_with_result",
+    "SurrogateModel",
+    "GPSurrogate",
+    "SVMSurrogate",
+    "MLPSurrogate",
+    "gp_mean_gradient",
+    "AcquisitionFunction",
+    "optimize_acquisition",
+    "optimize_acquisition_enhanced",
+    "optimize_acquisition_with_regional_focus",
+    "add_boundary_samples_2d",
+    "format_for_portal",
+    "PredictionTracker",
+    "visualize_2d_surface",
+    "analyze_function",
+    "analyze_weekly_performance",
+    "recommend_strategies",
+    "plot_progress",
+    "display_competition_summary",
+]
