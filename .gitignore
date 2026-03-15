@@ -1,0 +1,39 @@
+# Python artefacts
+__pycache__/
+*.py[cod]
+*.so
+*.egg-info/
+.eggs/
+
+# Environments
+.venv/
+venv/
+env/
+.env
+.envrc
+
+# Jupyter checkpoints
+.ipynb_checkpoints/
+*.ipynb_checkpoints/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# ML experiment tracking
+wandb/
+mlruns/
+.mlflow/
+
+# Compiled models (large files)
+*.keras
+*.pt
+*.pth
+*.ckpt
+
+# Zone.Identifier (WSL artefact)
+*.Zone.Identifier
