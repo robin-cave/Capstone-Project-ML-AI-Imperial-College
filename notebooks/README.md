@@ -102,6 +102,11 @@ class MyNewSurrogate(SurrogateModel):
         return "My New Model"
 ```
 
+## Slim weekly pipeline
+
+- **`weekly_workflow.ipynb`** — load `data/results/week_*`, set per-week `strategies`, run acquisition, `format_for_portal`.
+- **`llm_experiments.ipynb`** (Week 8+) — systematic LLM prompt / temperature / domain-context runs; logs to `data/results/week_8/llm_experiments.json`. Requires `openai` and/or `anthropic` and API keys. See `../../notes/BBO_Strategy_W8_Report.md`.
+
 ## Weekly Workflow
 
 ### Week N: Generate Queries

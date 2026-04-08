@@ -53,13 +53,12 @@ def optimize_acquisition(
     for i in range(n_dims):
         X_random[:, i] = X_random[:, i] * (bounds[i][1] - bounds[i][0]) + bounds[i][0]
     mean, std = surrogate.predict(X_random)
+    _, y_best = func_data.get_best()
     if acq_func == "ucb":
         acq_values = AcquisitionFunction.ucb(mean, std, beta=acq_params.get("beta", 2.0))
     elif acq_func == "ei":
-        _, y_best = func_data.get_best()
         acq_values = AcquisitionFunction.ei(mean, std, y_best, xi=acq_params.get("xi", 0.01))
     elif acq_func == "pi":
-        _, y_best = func_data.get_best()
         acq_values = AcquisitionFunction.pi(mean, std, y_best, xi=acq_params.get("xi", 0.01))
     else:
         raise ValueError(f"Unknown acquisition function: {acq_func}")
@@ -75,9 +74,7 @@ def optimize_acquisition(
             if acq_func == "ucb":
                 return -float(AcquisitionFunction.ucb(m, s, beta=acq_params.get("beta", 2.0))[0])
             if acq_func == "ei":
-                _, y_best = func_data.get_best()
                 return -float(AcquisitionFunction.ei(m, s, y_best, xi=acq_params.get("xi", 0.01))[0])
-            _, y_best = func_data.get_best()
             return -float(AcquisitionFunction.pi(m, s, y_best, xi=acq_params.get("xi", 0.01))[0])
 
         result = minimize(objective, x0, method="L-BFGS-B", bounds=bounds)
@@ -117,13 +114,12 @@ def optimize_acquisition_enhanced(
     X_near_best = np.clip(best_x + np.random.normal(0, 0.1, size=(n_near_best, n_dims)), bound_margin, 1.0 - bound_margin)
     X_random = np.vstack([X_random, X_near_best])
     mean, std = surrogate.predict(X_random)
+    _, y_best = func_data.get_best()
     if acq_func == "ucb":
         acq_values = AcquisitionFunction.ucb(mean, std, beta=acq_params.get("beta", 2.0))
     elif acq_func == "ei":
-        _, y_best = func_data.get_best()
         acq_values = AcquisitionFunction.ei(mean, std, y_best, xi=acq_params.get("xi", 0.01))
     elif acq_func == "pi":
-        _, y_best = func_data.get_best()
         acq_values = AcquisitionFunction.pi(mean, std, y_best, xi=acq_params.get("xi", 0.01))
     else:
         raise ValueError(f"Unknown acquisition function: {acq_func}")
@@ -139,9 +135,7 @@ def optimize_acquisition_enhanced(
             if acq_func == "ucb":
                 return -float(AcquisitionFunction.ucb(m, s, beta=acq_params.get("beta", 2.0))[0])
             if acq_func == "ei":
-                _, y_best = func_data.get_best()
                 return -float(AcquisitionFunction.ei(m, s, y_best, xi=acq_params.get("xi", 0.01))[0])
-            _, y_best = func_data.get_best()
             return -float(AcquisitionFunction.pi(m, s, y_best, xi=acq_params.get("xi", 0.01))[0])
 
         result = minimize(objective, x0, method="L-BFGS-B", bounds=bounds)
@@ -161,10 +155,12 @@ def optimize_acquisition_with_regional_focus(
     expand_search: bool = True,
     focus_region: Optional[np.ndarray] = None,
     focus_radius: float = 0.15,
+    random_state: Optional[int] = None,
     **acq_params: Any,
 ) -> Tuple[np.ndarray, float, float]:
     """Enhanced acquisition optimization with optional regional focus. Returns (next_query, pred_mean, pred_std).
     When focus_region is set, L-BFGS-B bounds are constrained to the focus box so the optimizer cannot escape."""
+    rng = np.random.default_rng(random_state)
     n_dims = func_data.n_dims
     n_refine = 10
     if expand_search:
@@ -180,25 +176,27 @@ def optimize_acquisition_with_regional_focus(
             for i in range(n_dims)
         ]
         bounds = focus_bounds
-    X_random = np.random.uniform(
+    X_random = rng.uniform(
         low=[b[0] for b in bounds], high=[b[1] for b in bounds], size=(n_random, n_dims)
     )
     if focus_region is not None:
         n_focus = n_random // 3
-        X_focus = np.clip(focus_region + np.random.normal(0, focus_radius, (n_focus, n_dims)), bound_margin, 1.0 - bound_margin)
+        low_focus = np.array([b[0] for b in focus_bounds])
+        high_focus = np.array([b[1] for b in focus_bounds])
+        X_focus = np.clip(focus_region + rng.normal(0, focus_radius, (n_focus, n_dims)), low_focus, high_focus)
         X_random = np.vstack([X_random, X_focus])
     best_x, _ = func_data.get_best()
     n_near_best = n_random // 5
-    X_near_best = np.clip(best_x + np.random.normal(0, 0.1, (n_near_best, n_dims)), bound_margin, 1.0 - bound_margin)
+    near_best_scale = min(0.1, focus_radius) if focus_region is not None else 0.1
+    X_near_best = np.clip(best_x + rng.normal(0, near_best_scale, (n_near_best, n_dims)), bound_margin, 1.0 - bound_margin)
     X_random = np.vstack([X_random, X_near_best])
     mean, std = surrogate.predict(X_random)
+    _, y_best = func_data.get_best()
     if acq_func == "ucb":
         acq_values = AcquisitionFunction.ucb(mean, std, beta=acq_params.get("beta", 2.0))
     elif acq_func == "ei":
-        _, y_best = func_data.get_best()
         acq_values = AcquisitionFunction.ei(mean, std, y_best, xi=acq_params.get("xi", 0.01))
     elif acq_func == "pi":
-        _, y_best = func_data.get_best()
         acq_values = AcquisitionFunction.pi(mean, std, y_best, xi=acq_params.get("xi", 0.01))
     else:
         raise ValueError(f"Unknown acquisition function: {acq_func}")
@@ -225,9 +223,7 @@ def optimize_acquisition_with_regional_focus(
             if acq_func == "ucb":
                 return -float(AcquisitionFunction.ucb(m, s, beta=acq_params.get("beta", 2.0))[0])
             if acq_func == "ei":
-                _, y_best = func_data.get_best()
                 return -float(AcquisitionFunction.ei(m, s, y_best, xi=acq_params.get("xi", 0.01))[0])
-            _, y_best = func_data.get_best()
             return -float(AcquisitionFunction.pi(m, s, y_best, xi=acq_params.get("xi", 0.01))[0])
 
         result = minimize(objective, x0, method="L-BFGS-B", bounds=bounds)

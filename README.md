@@ -4,7 +4,14 @@
 
 This capstone project tackles the optimization of 8 synthetic black-box functions (2D to 8D) simulating real-world scenarios including contamination detection, drug discovery, hyperparameter tuning, and manufacturing optimization. The challenge uses Bayesian optimization under strict constraints: only 1 query per function per week, making each evaluation decision critical.
 
+## Documentation
+
+- **[Datasheet](data_sheet.md)** — Dataset motivation, composition, collection process, preprocessing, intended uses, distribution, and maintenance (Mini-lesson 21.1 style).
+- **[Model Card](model_card.md)** — Name, version, and description of the optimisation *approach*; intended use; evolution across rounds; performance summary; assumptions, limitations, and ethical / transparency notes (Mini-lesson 21.2 style).
+
 ## Project Structure
+
+Paths below are relative to the `public/` directory unless noted.
 
 ```
 ├── src/                        # Reusable Python modules
@@ -12,23 +19,25 @@ This capstone project tackles the optimization of 8 synthetic black-box function
 │   ├── data.py                 # FunctionData, load_results, initialize_from_history
 │   ├── surrogates.py           # SurrogateModel ABC, GPSurrogate, SVMSurrogate, MLPSurrogate
 │   ├── acquisition.py          # Acquisition functions (UCB, EI, PI) and optimizers
-│   └── utils.py                # Formatting, visualization, analysis, tracking
+│   ├── utils.py                # Formatting, visualization, analysis, tracking
+│   └── llm_advisor.py          # Optional LLM-assisted query experiments (logging)
 ├── notebooks/
 │   ├── weekly_workflow.ipynb    # Main notebook: load data → set strategy → generate queries
 │   ├── data_management.ipynb   # Load new weekly results and update function history
 │   ├── model_comparison.ipynb  # Compare GP / SVR / MLP surrogates with LOO cross-validation
+│   ├── llm_experiments.ipynb   # Optional LLM experiment grid (e.g. week 8)
 │   └── archive/                # Original monolithic notebooks (preserved for reference)
 ├── data/
-│   ├── function_1/ .. function_8/   # Initial .npy inputs and outputs per function
+│   ├── function_1/ .. function_8/   # Initial .npy inputs/outputs; optional week_k_*.npy checkpoints
 │   └── results/
-│       └── week_1/ .. week_6/       # Weekly submitted inputs.txt and received outputs.txt
-├── notes/
-│   ├── Function_Analysis_and_Strategy_Report.md   # Per-function analysis and Week 5 strategies
-│   ├── Reflection_Responses.md                     # Written reflections on strategy evolution
-│   ├── Capstone Instructions.md                    # Function descriptions and rules
-│   └── Capstone project FAQ.md
+│       ├── week_1/ .. week_9/       # Weekly inputs.txt and outputs.txt from the portal
+│       └── week_8/llm_experiments.json   # Optional LLM run log
+├── data_sheet.md               # Dataset datasheet (link from Documentation above)
+├── model_card.md               # Optimisation approach model card
 └── requirements.txt            # numpy, scipy, scikit-learn, torch (CPU), matplotlib, jupyter
 ```
+
+**Strategy write-ups** (repository root, sibling of `public/`): `../notes/BBO_Strategy_W7_Report.md`, `../notes/BBO_Strategy_W8_Report.md`, `../notes/BBO_Strategy_W9_Report.md`, plus `../notes/Function_Analysis_and_Strategy_Report.md`, `../notes/Technical_Justification.md`, `../notes/Reflection_Responses.md`. Course PDFs may live under `../Project_Details/`.
 
 ## Functions
 
@@ -43,18 +52,20 @@ This capstone project tackles the optimization of 8 synthetic black-box function
 | F7 | 6D | ML hyperparameters | 6 hyperparameters for an ML model; non-stationary landscape |
 | F8 | 8D | High-dimensional system | 8 hyperparameters; complex interactions, hard for GP |
 
-## Results (Weeks 1-6)
+## Results (Weeks 1–9)
 
-| Function | Initial Best | W1 | W2 | W3 | W4 | W5 | W6 | Cumulative Best | Improvement |
-|----------|-------------|-----|-----|-----|-----|-----|-----|-----------------|-------------|
-| F1 (2D) | 0.000 | 0.000 | 0.000 | 0.000 | 0.000 | 0.000 | 2.68e-09 | 0.000 | Stuck |
-| F2 (2D) | 0.611 | 0.279 | 0.247 | 0.510 | 0.621 | 0.084 | 0.398 | 0.621 | +1.6% |
-| F3 (3D) | -0.035 | -0.022 | -0.025 | -0.111 | -0.033 | **-0.006** | -0.027 | **-0.006** | +84% |
-| F4 (4D) | -4.026 | 0.548 | 0.661 | -0.144 | 0.030 | 0.603 | 0.637 | 0.661 | +4.687 |
-| F5 (4D) | 1088.9 | 2517.6 | 91.3 | 5328.0 | 7223.2 | 1873.8 | **8662.4** | **8662.4** | +695% |
-| F6 (5D) | -0.714 | -0.565 | -0.570 | -1.501 | -0.937 | -0.811 | **-0.520** | **-0.520** | +27% |
-| F7 (6D) | 1.365 | 1.711 | 1.597 | 2.468 | 1.585 | 0.947 | 2.284 | 2.468 | +81% |
-| F8 (8D) | 9.598 | 9.515 | 9.932 | 9.828 | 9.224 | 9.887 | **9.947** | **9.947** | +3.6% |
+Weekly columns are the **submitted round’s** observed value for each function (portal batch), not the cumulative best. **Cumulative best** is the best value seen from the initial design through week 9.
+
+| Function | Initial best | W1 | W2 | W3 | W4 | W5 | W6 | W7 | W8 | W9 | Cumulative best (≤W9) | Notes |
+|----------|-------------|-----|-----|-----|-----|-----|-----|-----|-----|-----|------------------------|--------|
+| F1 (2D) | ≈0 | ≈0 | ≈0 | ≈0 | ≈0 | ≈0 | ≈0 | ≈0 | ≈0 | ≈0 | ≈0 | Stuck |
+| F2 (2D) | 0.611 | 0.279 | 0.247 | 0.510 | **0.621** | 0.084 | 0.398 | 0.500 | 0.392 | 0.598 | **0.621** | Best in W4 |
+| F3 (3D) | -0.035 | -0.022 | -0.025 | -0.111 | -0.033 | **-0.0055** | -0.027 | -0.0085 | -0.0061 | -0.014 | **-0.0055** | Best in W5 |
+| F4 (4D) | -4.026 | 0.548 | 0.661 | -0.144 | 0.030 | 0.603 | 0.637 | 0.598 | 0.478 | **0.667** | **0.667** | Narrow peak |
+| F5 (4D) | 1089 | 2518 | 91.3 | 5328 | 7223 | 1874 | **8662** | 8452 | 163 | 8662 | **8662** | Boundary |
+| F6 (5D) | -0.714 | -0.565 | -0.570 | -1.501 | -0.937 | -0.811 | -0.520 | -0.545 | **-0.474** | -0.647 | **-0.474** | Best in W8 |
+| F7 (6D) | 1.365 | 1.711 | 1.597 | 2.468 | 1.585 | 0.947 | 2.284 | 2.636 | **2.836** | 2.489 | **2.836** | Best in W8 |
+| F8 (8D) | 9.598 | 9.515 | 9.932 | 9.828 | 9.224 | 9.887 | 9.947 | 9.959 | 9.968 | **9.971** | **9.971** | Diminishing returns |
 
 ## Technical Approach
 
@@ -84,15 +95,18 @@ Optimization uses a two-stage hybrid: random candidate generation (with optional
 | Targeted | W4 | Function-specific focus regions, moderate exploitation | F5 hit 7223; F2 recovered to initial best |
 | Multi-model | W5 | SVR for F2, MLP for F6-F8, GP-ARD for F3-F4 | Only F3 improved; SVR/MLP regressions; F5 escaped focus (bug) |
 | Consolidation | W6 | Manual F1/F5; GP-ARD for F3-F4,F6-F7; GP+noise F2; SVR F8; regional focus bounds fixed | 3 new bests (F5, F6, F8); F5 +20%, F6 +8%, F8 +0.2% |
-| Final push | W7 | Manual F1/F5; GP tight for F2 (new point near best); GP-ARD tighter (F3/F4/F6/F7); focus on W6 bests for F6/F8 | Exploit W6 wins; F2: new query near [0.70, 0.93]; probe F1 near center |
+| Final push | W7 | Manual F1/F5; GP tight for F2; GP-ARD tighter on F3–F7; focus on W6 bests for F6/F8 | Exploit W6 wins; F7/F8 new bests |
+| LLM + diagnostics | W8 | Surrogate defaults plus optional LLM experiments; deliberate low-corner probe on one function | Structured logging; test global structure vs boundary peak |
+| Scaling / mixed | W9 | Manual re-centring on narrow peaks and boundary; UCB on one trajectory; SVR micro-step on 8D | Large focus radius can regress; tiny steps help on sharp peaks |
+| Conservative | W10 | Smaller radii; EI over UCB where W9 regressed; surrogate micro-perturb near new bests | Protect cumulative bests with 3 rounds left |
 
 ### Key Insights
 
 1. **Dimensionality determines surrogate choice**: GP works well up to ~4D; MLP or SVR needed for 5D+
-2. **Data scarcity demands caution**: With 14-44 points, aggressive exploitation risks overfitting to sparse data
+2. **Data scarcity demands caution**: With 20–50 points, aggressive exploitation risks overfitting to sparse data
 3. **Function-specific strategies are essential**: F5 (unimodal, push boundary) vs F4 (narrow peak, ultra-tight focus) vs F1 (no signal, space-filling) require fundamentally different approaches
-4. **Regional focus prevents catastrophic jumps**: Focus radius constraints (0.02-0.15) keep queries near known good regions, avoiding cliffs like F4's Week 3 collapse
-5. **Failure teaches more than success**: Week 2's 96% F5 collapse led to the recovery strategy and regional focus mechanism used in all subsequent weeks
+4. **Regional focus prevents catastrophic jumps**: Focus radius constraints (0.005–0.15) keep queries near known good regions, avoiding cliffs like F4's Week 3 collapse
+5. **Failure teaches more than success**: Week 2's F5 collapse led to the recovery strategy and regional focus mechanism used in subsequent weeks
 
 ## Setup
 
@@ -112,5 +126,10 @@ pip install torch --index-url https://download.pytorch.org/whl/cpu
 
 ---
 
-**Detailed per-function analysis**: See [`notes/Function_Analysis_and_Strategy_Report.md`](notes/Function_Analysis_and_Strategy_Report.md)
-**Technical justification and literature**: See [`notes/Technical_Justification.md`](notes/Technical_Justification.md)
+**Datasheet & model card:** [data_sheet.md](data_sheet.md) · [model_card.md](model_card.md)
+
+**Detailed per-function analysis:** [../notes/Function_Analysis_and_Strategy_Report.md](../notes/Function_Analysis_and_Strategy_Report.md)
+
+**Technical justification and literature:** [../notes/Technical_Justification.md](../notes/Technical_Justification.md)
+
+**Weekly strategy reports:** [../notes/BBO_Strategy_W7_Report.md](../notes/BBO_Strategy_W7_Report.md), [../notes/BBO_Strategy_W8_Report.md](../notes/BBO_Strategy_W8_Report.md), [../notes/BBO_Strategy_W9_Report.md](../notes/BBO_Strategy_W9_Report.md)

@@ -16,3 +16,8 @@ ipykernel>=6.0.0
 
 # Optional: Enhanced visualizations
 seaborn>=0.11.0
+
+# Week 8+ LLM experiment framework (optional; install only if using llm_experiments.ipynb)
+openai>=1.0.0
+anthropic>=0.18.0
+pandas>=2.0.0

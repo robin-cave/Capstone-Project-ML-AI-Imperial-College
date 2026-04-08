@@ -29,6 +29,15 @@ from .utils import (
     plot_progress,
     display_competition_summary,
 )
+from .llm_advisor import (
+    DOMAIN_CONTEXTS,
+    LLMClient,
+    LLMResponse,
+    PromptBuilder,
+    ResponseParser,
+    ExperimentLogger,
+    surrogate_mean_at,
+)
 
 __all__ = [
     "FunctionData",
@@ -59,4 +68,11 @@ __all__ = [
     "recommend_strategies",
     "plot_progress",
     "display_competition_summary",
+    "DOMAIN_CONTEXTS",
+    "LLMClient",
+    "LLMResponse",
+    "PromptBuilder",
+    "ResponseParser",
+    "ExperimentLogger",
+    "surrogate_mean_at",
 ]

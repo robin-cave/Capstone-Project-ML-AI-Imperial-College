@@ -34,12 +34,13 @@ class GPSurrogate(SurrogateModel):
     def __init__(
         self,
         length_scale: float = 1.0,
-        length_scale_bounds: Tuple[float, float] = (1e-2, 1e2),
+        length_scale_bounds: Tuple[float, float] = (1e-2, 1e3),
         noise: float = 1e-5,
         optimize: bool = True,
         use_ard: bool = False,
     ):
         self.length_scale = length_scale
+        # Upper bound 1e3 avoids ConvergenceWarning when a dimension has very long length scale
         self.length_scale_bounds = length_scale_bounds
         self.noise = noise
         self.optimize = optimize
