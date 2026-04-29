@@ -1,7 +1,7 @@
 """
 Acquisition functions and optimization for Bayesian optimization.
 """
-from typing import Any, Optional, Tuple
+from typing import Any, Optional, Tuple, Union
 import numpy as np
 from scipy.stats import norm
 from scipy.optimize import minimize
@@ -154,12 +154,15 @@ def optimize_acquisition_with_regional_focus(
     bound_margin: float = 0.02,
     expand_search: bool = True,
     focus_region: Optional[np.ndarray] = None,
-    focus_radius: float = 0.15,
+    focus_radius: Union[float, np.ndarray] = 0.15,
     random_state: Optional[int] = None,
     **acq_params: Any,
 ) -> Tuple[np.ndarray, float, float]:
     """Enhanced acquisition optimization with optional regional focus. Returns (next_query, pred_mean, pred_std).
-    When focus_region is set, L-BFGS-B bounds are constrained to the focus box so the optimizer cannot escape."""
+    When focus_region is set, L-BFGS-B bounds are constrained to the focus box so the optimizer cannot escape.
+
+    focus_radius accepts either a scalar (same radius on every axis) or a 1-D array of length n_dims
+    (per-axis radii, used to freeze dimensions by setting their radius to 0 or near-0)."""
     rng = np.random.default_rng(random_state)
     n_dims = func_data.n_dims
     n_refine = 10
@@ -171,8 +174,10 @@ def optimize_acquisition_with_regional_focus(
         full_bounds = list(zip(X_min, X_max))
     bounds = full_bounds
     if focus_region is not None:
+        radius_arr = np.broadcast_to(np.asarray(focus_radius, dtype=float), (n_dims,)).astype(float)
         focus_bounds = [
-            (max(bound_margin, float(focus_region[i]) - focus_radius), min(1.0 - bound_margin, float(focus_region[i]) + focus_radius))
+            (max(bound_margin, float(focus_region[i]) - float(radius_arr[i])),
+             min(1.0 - bound_margin, float(focus_region[i]) + float(radius_arr[i])))
             for i in range(n_dims)
         ]
         bounds = focus_bounds
@@ -183,11 +188,14 @@ def optimize_acquisition_with_regional_focus(
         n_focus = n_random // 3
         low_focus = np.array([b[0] for b in focus_bounds])
         high_focus = np.array([b[1] for b in focus_bounds])
-        X_focus = np.clip(focus_region + rng.normal(0, focus_radius, (n_focus, n_dims)), low_focus, high_focus)
+        X_focus = np.clip(focus_region + rng.normal(0, radius_arr, (n_focus, n_dims)), low_focus, high_focus)
         X_random = np.vstack([X_random, X_focus])
     best_x, _ = func_data.get_best()
     n_near_best = n_random // 5
-    near_best_scale = min(0.1, focus_radius) if focus_region is not None else 0.1
+    if focus_region is not None:
+        near_best_scale = np.minimum(0.1, radius_arr)
+    else:
+        near_best_scale = 0.1
     X_near_best = np.clip(best_x + rng.normal(0, near_best_scale, (n_near_best, n_dims)), bound_margin, 1.0 - bound_margin)
     X_random = np.vstack([X_random, X_near_best])
     mean, std = surrogate.predict(X_random)

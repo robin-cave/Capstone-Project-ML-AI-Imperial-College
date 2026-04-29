@@ -1,0 +1,84 @@
+{
+  "1": {
+    "focus_region": [
+      0.6677071605835315,
+      0.05036104882703159
+    ],
+    "focus_radius": 0.05,
+    "strategy": "manual_space_fill"
+  },
+  "2": {
+    "focus_region": [
+      0.7,
+      0.935
+    ],
+    "focus_radius": 0.01,
+    "strategy": "gp_ei_tight"
+  },
+  "3": {
+    "focus_region": [
+      0.404741,
+      0.3916466666666667,
+      0.48275633333333334
+    ],
+    "focus_radius": 0.008,
+    "strategy": "gp_ard_ei_tight"
+  },
+  "4": {
+    "focus_region": [
+      0.42157,
+      0.4127673333333333,
+      0.35782733333333333,
+      0.422996
+    ],
+    "focus_radius": 0.005,
+    "strategy": "gp_ard_ei_ultra_tight"
+  },
+  "5": {
+    "focus_region": [
+      0.996,
+      0.993,
+      0.999,
+      0.994
+    ],
+    "focus_radius": 0.005,
+    "strategy": "manual_boundary"
+  },
+  "6": {
+    "focus_region": [
+      0.23,
+      0.285,
+      0.43,
+      0.79,
+      0.03
+    ],
+    "focus_radius": 0.015,
+    "strategy": "gp_ard_ei_pca_informed"
+  },
+  "7": {
+    "focus_region": [
+      0.16556283208734818,
+      0.11396161741888389,
+      0.46541726826328267,
+      0.21618518789652108,
+      0.3186532531291829,
+      0.7284447367412842
+    ],
+    "focus_radius": 0.03,
+    "strategy": "gp_ard_ucb_pc1_extrapolation"
+  },
+  "8": {
+    "focus_region": [
+      0.11410519999999999,
+      0.2424,
+      0.10251860000000002,
+      0.16340000000000005,
+      0.8246,
+      0.3754,
+      0.16740000000000005,
+      0.5564412000000001
+    ],
+    "focus_radius": 0.008,
+    "strategy": "svr_ei_tight_centroid"
+  }
+}

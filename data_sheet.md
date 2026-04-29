@@ -4,7 +4,7 @@ This datasheet documents the dataset produced and accumulated during the Imperia
 
 ## Motivation
 
-- **Purpose:** The dataset exists to support **sequential optimisation** of eight synthetic black-box objective functions under a strict evaluation budget: **one query per function per week** for twelve weeks. It captures every submitted design point and the corresponding oracle response, enabling analysis of exploration–exploitation trade-offs, surrogate-based acquisition, and strategy evolution under extreme data scarcity.
+- **Purpose:** The dataset exists to support **sequential optimisation** of eight synthetic black-box objective functions under a strict evaluation budget: **one query per function per week** across thirteen submission rounds (the twelve scheduled weeks plus a W13 bonus round). It captures every submitted design point and the corresponding oracle response, enabling analysis of exploration–exploitation trade-offs, surrogate-based acquisition, and strategy evolution under extreme data scarcity.
 - **Task supported:** Empirical study of **Bayesian optimisation-style** workflows (Gaussian processes, alternative surrogates, acquisition functions, manual and hybrid probes) on problems from 2D to 8D in the unit hypercube.
 - **Creator and context:** Created by the student author as coursework for the BBO capstone. The **initial design** and **oracle** (hidden objective functions) are provided by the course; **weekly queries** are chosen by the student using the code and notebooks in this repository.
 - **Funding:** Academic coursework only; no external funding for dataset creation.
@@ -16,7 +16,7 @@ This datasheet documents the dataset produced and accumulated during the Imperia
   - **Per function:** `initial_inputs.npy` / `initial_outputs.npy` (course-provided starting designs; sample counts scale with dimensionality, roughly 10–40 points per function).
   - **Weekly batches:** For each week *k*, `public/data/results/week_k/inputs.txt` and `outputs.txt` list the eight submitted points and received values (one row per function per week, in function order).
   - **Optional checkpoints:** `week_k_inputs.npy` / `week_k_outputs.npy` under `data/function_*` store **cumulative** design matrices and response vectors after ingesting week *k* (when the data-management workflow is run).
-- **Size (order of magnitude):** After *n* weeks, each function has on the order of **initial samples + n** observations (e.g. ~18 + *n* for 2D functions with a larger initial design, up to ~40 + *n* for 8D, depending on course baseline).
+- **Size (order of magnitude):** After *n* weeks, each function has on the order of **initial samples + n** observations (e.g. ~18 + *n* for 2D functions with a larger initial design, up to ~40 + *n* for 8D, depending on course baseline). At *n* = 13 (the current total) this yields on the order of 30–55 observations per function.
 - **Format:** Floating-point arrays (`.npy`); weekly portal logs as text representations of NumPy arrays.
 - **Missing data:** None in the stored artefacts; every submitted point has a recorded response.
 - **Sensitive or confidential content:** **No.** Synthetic objectives only; no personal data, no privileged records, no communications content.
@@ -26,7 +26,7 @@ This datasheet documents the dataset produced and accumulated during the Imperia
 - **Acquisition of initial data:** Provided by the course as fixed `.npy` files per function.
 - **Acquisition of weekly data:** Each week, the student runs `notebooks/weekly_workflow.ipynb` (and related modules) to fit **surrogate models** (e.g. GP with RBF/ARD, SVR bootstrap ensemble, optional MLP) and optimise **acquisition functions** (UCB, EI, PI) with optional **regional focus** (bounding box around a hand-picked anchor). Some weeks include **manual** queries (e.g. boundary probes, grid corners) driven by written strategy reports.
 - **Sampling strategy:** **Adaptive sequential design** — not i.i.d. sampling from the domain. Later points cluster near historically strong regions (exploitation) or test explicit hypotheses (e.g. corners, boundaries). This induces **strong spatial and temporal bias** relative to uniform exploration.
-- **Time frame:** Weekly submissions over the capstone period; repository includes results through **`public/data/results/week_1` … `week_9`** (and may be extended to week_12). Oracle behaviour is **deterministic**: the same **x** yields the same **y** (no explicit observation noise in the logged outputs).
+- **Time frame:** Weekly submissions over the capstone period; repository currently includes results through **`public/data/results/week_1` … `week_13`**. Oracle behaviour is **deterministic**: the same **x** yields the same **y** (no explicit observation noise in the logged outputs).
 
 ## Preprocessing / cleaning / labelling
 

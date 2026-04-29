@@ -66,6 +66,14 @@ class FunctionData:
         return f"Function {self.function_id}: {self.n_dims}D, {self.n_samples} samples, best={best_y:.6f}"
 
 
+def _sort_week_dirs(dirs: List[Path]) -> List[Path]:
+    """Sort week_N directories numerically instead of lexicographically."""
+    def _week_number(p: Path) -> int:
+        m = re.search(r"week_(\d+)$", p.name)
+        return int(m.group(1)) if m else 0
+    return sorted(dirs, key=_week_number)
+
+
 def _extract_all_lists(file_path: Path) -> List[str]:
     """Extract list structures from a file (one or more [...] blocks)."""
     with open(file_path, "r") as f:
@@ -91,7 +99,7 @@ def _find_results_dirs() -> Tuple[Optional[Path], bool]:
     Returns (base_path, use_new_layout).
     """
     if RESULTS_BASE.exists():
-        week_dirs = sorted(RESULTS_BASE.glob("week_*"))
+        week_dirs = _sort_week_dirs(list(RESULTS_BASE.glob("week_*")))
         if week_dirs and (week_dirs[0] / "inputs.txt").exists():
             return RESULTS_BASE, True
     legacy = sorted(PROJECT_ROOT.glob("Week *"))
@@ -148,7 +156,7 @@ def load_results(
         raise FileNotFoundError("No results directories found (no data/results/week_* or Week *)")
 
     if use_new_layout:
-        week_dirs = sorted(base_path.glob("week_*"))
+        week_dirs = _sort_week_dirs(list(base_path.glob("week_*")))
         if not week_dirs:
             raise FileNotFoundError(f"No week_* dirs in {base_path}")
         try:
@@ -165,15 +173,9 @@ def load_results(
         outputs_lists = _extract_all_lists(outputs_file)
         if not inputs_lists or not outputs_lists:
             raise ValueError(f"No valid data in {target_dir}")
-        # New layout: file in week_n may have one or multiple lists (cumulative); use list at week_index
-        if week_index < 0:
-            idx = len(inputs_lists) + week_index
-        else:
-            idx = week_index
-        if idx < 0 or idx >= len(inputs_lists):
-            raise IndexError(f"Week index {week_index} out of range (file has {len(inputs_lists)} list(s))")
-        inputs_content = inputs_lists[idx]
-        outputs_content = outputs_lists[idx]
+        # Each week_N dir typically has one list; use last entry if multiple
+        inputs_content = inputs_lists[-1]
+        outputs_content = outputs_lists[-1]
         actual_week_num = week_index + 1 if week_index >= 0 else len(week_dirs) + week_index + 1
         return _parse_inputs_outputs(inputs_content, outputs_content, target_dir, actual_week_num)
 
@@ -242,7 +244,7 @@ def initialize_from_history(
         raise FileNotFoundError("No results directories found")
 
     if use_new:
-        week_dirs = sorted(base_path.glob("week_*"))
+        week_dirs = _sort_week_dirs(list(base_path.glob("week_*")))
         num_available = len(week_dirs)
     else:
         inp = base_path / "inputs.txt"
@@ -371,7 +373,7 @@ def load_all_weeks(
     if base_path is None:
         raise FileNotFoundError("No results directories found")
     if use_new:
-        week_dirs = sorted(base_path.glob("week_*"))
+        week_dirs = _sort_week_dirs(list(base_path.glob("week_*")))
         num_weeks = len(week_dirs)
     else:
         inp = base_path / "inputs.txt"

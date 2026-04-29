@@ -37,3 +37,4 @@ mlruns/
 
 # Zone.Identifier (WSL artefact)
 *.Zone.Identifier
+*:Zone.Identifier
