@@ -102,10 +102,16 @@ class MyNewSurrogate(SurrogateModel):
         return "My New Model"
 ```
 
-## Slim weekly pipeline
+## All Notebooks
 
-- **`weekly_workflow.ipynb`** — load `data/results/week_*`, set per-week `strategies`, run acquisition, `format_for_portal`.
-- **`llm_experiments.ipynb`** (Week 8+) — systematic LLM prompt / temperature / domain-context runs; logs to `data/results/week_8/llm_experiments.json`. Requires `openai` and/or `anthropic` and API keys. See `../../notes/BBO_Strategy_W8_Report.md`.
+| Notebook | Purpose |
+|----------|---------|
+| **`weekly_workflow.ipynb`** | Main pipeline: load `data/results/week_*`, set per-function strategies, run acquisition, format output with `format_for_portal()`. This is the notebook used every round. |
+| **`bayesian_optimization.ipynb`** | Standalone Bayesian optimisation walkthrough covering GP fitting, acquisition functions, and visualisation. Good starting point for understanding the method. |
+| **`data_management.ipynb`** | Ingest new weekly `inputs.txt` / `outputs.txt` from the portal into per-function cumulative `.npy` checkpoints. Run this first after each round. |
+| **`model_comparison.ipynb`** | Leave-one-out cross-validation comparing GP, GP-ARD, SVR ensemble, and MLP surrogates per function. Used to justify per-function surrogate assignment. |
+| **`pca_analysis.ipynb`** | Linear PCA and kernel PCA on each function's best-point cluster. Exports focus regions to `data/results/week_12/pca_week12.json`. Introduced in Week 12. |
+| **`llm_experiments.ipynb`** | Systematic LLM prompt / temperature / domain-context experiment grid (Week 8). Logs to `data/results/week_8/llm_experiments.json`. Requires `openai` and/or `anthropic` packages and API keys. |
 
 ## Weekly Workflow
 

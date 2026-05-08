@@ -102,7 +102,7 @@ Cells in **bold** are the cumulative best at that week. Raw data lives in `publi
 4. **PCA of best-point clusters is a surprisingly strong prior.** On F7 the PC1 direction of the top-5 predicted a near-1D improvement trajectory through W12; on F8 it flagged an effective-1D manifold that justified a micro-step SVR strategy.
 5. **"No signal" is a reversible conclusion.** F1 was called stuck for ten rounds; the central probes at W6 (`[0.5, 0.5]` → 2.7e−09) and W13 (`[⅓, ⅓]` → 1.4e−11) are several orders of magnitude above all other queries, suggesting a genuine centre-of-cube peak that boundary grids missed.
 
-Detailed per-week commentary lives in [`../notes/BBO_Strategy_W7_Report.md`](../notes/BBO_Strategy_W7_Report.md), [`W8`](../notes/BBO_Strategy_W8_Report.md), [`W9`](../notes/BBO_Strategy_W9_Report.md), [`W11`](../notes/BBO_Strategy_W11_Report.md), and [`W12`](../notes/BBO_Strategy_W12_Report.md).
+Detailed per-week strategy commentary was maintained in separate reports throughout the project (W7–W12).
 
 ## REPOSITORY STRUCTURE
 
@@ -122,8 +122,7 @@ Paths below are relative to `public/` unless noted.
 │   ├── model_comparison.ipynb   # Compare GP / SVR / MLP surrogates with LOO cross-validation
 │   ├── pca_analysis.ipynb       # W12 PCA / kernel-PCA per function; exports pca_week12.json
 │   ├── llm_experiments.ipynb    # Optional LLM experiment grid (e.g. week 8)
-│   ├── bayesian_optimization.ipynb  # Standalone BO walkthrough
-│   └── archive/                 # Original monolithic notebooks (preserved for reference)
+│   └── bayesian_optimization.ipynb  # Standalone BO walkthrough
 ├── data/
 │   ├── function_1/ … function_8/     # Initial .npy inputs/outputs; optional week_k_*.npy checkpoints
 │   └── results/
@@ -138,7 +137,7 @@ Paths below are relative to `public/` unless noted.
 └── requirements.txt             # numpy, scipy, scikit-learn, torch (CPU), matplotlib, jupyter
 ```
 
-**Strategy write-ups** (repository root, sibling of `public/`): [`../notes/BBO_Strategy_W7_Report.md`](../notes/BBO_Strategy_W7_Report.md), [`W8`](../notes/BBO_Strategy_W8_Report.md), [`W9`](../notes/BBO_Strategy_W9_Report.md), [`W11`](../notes/BBO_Strategy_W11_Report.md), [`W12`](../notes/BBO_Strategy_W12_Report.md), plus [`Function_Analysis_and_Strategy_Report.md`](../notes/Function_Analysis_and_Strategy_Report.md), [`Technical_Justification.md`](../notes/Technical_Justification.md), and [`Reflection_Responses.md`](../notes/Reflection_Responses.md).
+**Strategy write-ups:** Weekly strategy reports (W7–W12) and supporting documents (Function Analysis, Technical Justification, Reflection Responses) were maintained alongside the codebase throughout the project.
 
 ## SETUP
 
@@ -162,4 +161,4 @@ pip install torch --index-url https://download.pytorch.org/whl/cpu
 
 **Datasheet & model card:** [data_sheet.md](data_sheet.md) · [model_card.md](model_card.md)
 
-**Regenerate the Results plot:** `python public/figures/_build_cumulative_best.py`
+**Regenerate the Results plot:** `python figures/_build_cumulative_best.py`

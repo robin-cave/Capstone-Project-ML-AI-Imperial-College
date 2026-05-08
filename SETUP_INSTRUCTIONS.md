@@ -14,7 +14,7 @@ This guide will help you set up a Python environment to run the Jupyter notebook
 Navigate to your project directory:
 
 ```bash
-cd /home/robin/Personal_Development/Capstone-Project-ML-AI-Imperial-College
+cd Capstone-Project-ML-AI-Imperial-College
 ```
 
 ### Step 2: Create Virtual Environment
@@ -58,7 +58,7 @@ python -m ipykernel install --user --name=bayesian-opt --display-name "Bayesian 
 jupyter notebook
 ```
 
-This will open Jupyter in your browser. Navigate to `notebooks/bayesian_optimization.ipynb`.
+This will open Jupyter in your browser. Navigate to `notebooks/weekly_workflow.ipynb` (the main pipeline) or `notebooks/bayesian_optimization.ipynb` (standalone walkthrough).
 
 ### Step 7: Select the Correct Kernel
 
@@ -129,7 +129,7 @@ For Linux/Mac users, here's a quick copy-paste setup:
 
 ```bash
 # Navigate to project
-cd /home/robin/Personal_Development/Capstone-Project-ML-AI-Imperial-College
+cd Capstone-Project-ML-AI-Imperial-College
 
 # Create and activate virtual environment
 python3 -m venv venv
